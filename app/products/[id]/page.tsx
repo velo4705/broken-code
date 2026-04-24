@@ -52,16 +52,32 @@ export default function ProductDetails() {
     }
   };
 
-  if (loading) return <div className="bg-black min-h-screen flex items-center justify-center text-white">Loading...</div>;
+  if (loading) return null;
 
-  if (!product) return <div className="bg-black min-h-screen flex items-center justify-center text-white">Product not found</div>;
+  if (!product) return (
+    <>
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-4">Product not found</h1>
+          <button
+            onClick={() => router.push('/products')}
+            className="text-[var(--accent-secondary)] hover:underline"
+          >
+            Back to Products
+          </button>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
 
   const displayImage = product.image_url || product.image || '/images/headphone.png';
 
   return (
-    <div className="bg-black min-h-screen">
+    <>
       <Navbar />
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="flex-1 container mx-auto px-6 py-12">
         <button
           onClick={() => router.back()}
           className="mb-6 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
@@ -107,6 +123,6 @@ export default function ProductDetails() {
         </div>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

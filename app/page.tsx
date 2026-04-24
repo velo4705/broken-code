@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import ProductGrid from '@/components/products/ProductGrid'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import HeroSection from '@/components/layout/HeroSection'
 import type { Product } from '@/types'
 
 export default function HomePage() {
@@ -21,7 +22,6 @@ export default function HomePage() {
   }, [])
 
   const handleCheckout = async (priceId: string) => {
-    // Attempt to find the product by matching ANY possible ID field
     const product = products.find(p =>
       p.stripe_price_id === priceId ||
       p.price_id === priceId ||
@@ -54,21 +54,18 @@ export default function HomePage() {
     }
   }
 
-  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
+  if (loading) return null;
 
   return (
-    <div className="bg-black min-h-screen">
+    <>
       <Navbar />
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="mb-12 text-center">
-          <h1 className="text-5xl font-extrabold text-[var(--text-primary)] mb-4">Discover Amazing Products</h1>
-          <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-            Shop the latest tech, fashion, and lifestyle products with secure checkout powered by Stripe.
-          </p>
+      <main className="flex-1">
+        <HeroSection />
+        <div className="container mx-auto px-6 py-12">
+          <ProductGrid products={products} onBuyNow={handleCheckout} />
         </div>
-        <ProductGrid products={products} onBuyNow={handleCheckout} />
       </main>
       <Footer />
-    </div>
+    </>
   )
 }
