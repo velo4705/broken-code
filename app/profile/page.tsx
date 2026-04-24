@@ -31,6 +31,14 @@ export default function ProfilePage() {
         created_at: user.created_at || '',
       });
 
+      // TODO: Fetch order history from your orders table
+      // const { data: orders } = await supabase
+      //   .from('orders')
+      //   .select('*')
+      //   .eq('user_id', user.id)
+      //   .order('created_at', { ascending: false });
+      // setOrderHistory(orders || []);
+
       setLoading(false);
     }
 
@@ -44,21 +52,21 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <>
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <Navbar />
-        <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
-      </>
+        <div className="text-white">Loading...</div>
+      </div>
     );
   }
 
   if (!user) {
-    return null;
+    return null; // Will redirect to login
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-black">
       <Navbar />
-      <main className="flex-1 container mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-8">My Profile</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -143,6 +151,6 @@ export default function ProfilePage() {
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

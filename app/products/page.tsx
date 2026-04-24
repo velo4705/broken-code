@@ -67,18 +67,18 @@ export default function ProductsPage() {
     }
   }
 
-  if (loading) return null;
+  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category).filter((c): c is string => Boolean(c))))]
 
   return (
-    <>
+    <div className="bg-black min-h-screen">
       <Navbar />
-      <main className="flex-1 container mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-12">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-[var(--text-primary)] mb-4">All Products</h1>
-          <p className="text-lg sm:text-xl text-[var(--text-secondary)]">
+          <h1 className="text-5xl font-extrabold text-[var(--text-primary)] mb-4">All Products</h1>
+          <p className="text-xl text-[var(--text-secondary)]">
             Browse our complete collection of premium products.
           </p>
         </div>
@@ -104,6 +104,6 @@ export default function ProductsPage() {
         )}
       </main>
       <Footer />
-    </>
+    </div>
   )
 }
