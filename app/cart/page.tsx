@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/store';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import CartItem from '@/components/cart/CartItem';
 
 export default function CartPage() {
   const router = useRouter();
@@ -12,9 +11,9 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-black">
+      <>
         <Navbar />
-        <main className="max-w-4xl mx-auto px-6 py-32 text-center">
+        <main className="flex-1 container mx-auto px-6 py-32 text-center">
           <div className="text-[var(--text-secondary)]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-24 h-24 mx-auto mb-6 opacity-50">
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -30,14 +29,14 @@ export default function CartPage() {
           </div>
         </main>
         <Footer />
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <>
       <Navbar />
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="flex-1 container mx-auto px-6 py-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-[var(--text-primary)]">
             Shopping Cart ({getTotalItems()} items)
@@ -143,6 +142,6 @@ export default function CartPage() {
         </div>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }
