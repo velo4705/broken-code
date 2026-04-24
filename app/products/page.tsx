@@ -5,23 +5,36 @@ import { supabase } from '@/lib/supabase'
 import ProductGrid from '@/components/products/ProductGrid'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import CategoryPills from '@/components/products/CategoryPills'
 import type { Product } from '@/types'
 
-export default function HomePage() {
+export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
   useEffect(() => {
     async function getProducts() {
       const { data, error } = await supabase.from('products').select('*')
-      if (!error && data) setProducts(data as Product[])
+      if (!error && data) {
+        setProducts(data as Product[])
+        setFilteredProducts(data as Product[])
+      }
       setLoading(false)
     }
     getProducts()
   }, [])
 
+  useEffect(() => {
+    if (selectedCategory === 'all') {
+      setFilteredProducts(products)
+    } else {
+      setFilteredProducts(products.filter(p => p.category === selectedCategory))
+    }
+  }, [selectedCategory, products])
+
   const handleCheckout = async (priceId: string) => {
-    // Attempt to find the product by matching ANY possible ID field
     const product = products.find(p =>
       p.stripe_price_id === priceId ||
       p.price_id === priceId ||
@@ -56,17 +69,39 @@ export default function HomePage() {
 
   if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
 
+  // Get unique categories
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.category).filter((c): c is string => Boolean(c))))]
+
   return (
     <div className="bg-black min-h-screen">
       <Navbar />
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="mb-12 text-center">
-          <h1 className="text-5xl font-extrabold text-[var(--text-primary)] mb-4">Discover Amazing Products</h1>
-          <p className="text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
-            Shop the latest tech, fashion, and lifestyle products with secure checkout powered by Stripe.
+        <div className="mb-12">
+          <h1 className="text-5xl font-extrabold text-[var(--text-primary)] mb-4">All Products</h1>
+          <p className="text-xl text-[var(--text-secondary)]">
+            Browse our complete collection of premium products.
           </p>
         </div>
-        <ProductGrid products={products} onBuyNow={handleCheckout} />
+
+        {/* Category Filter */}
+        {categories.length > 1 && (
+          <div className="mb-8">
+            <CategoryPills
+              categories={categories}
+              selected={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+          </div>
+        )}
+
+        {/* Products Grid */}
+        {filteredProducts.length > 0 ? (
+          <ProductGrid products={filteredProducts} onBuyNow={handleCheckout} />
+        ) : (
+          <div className="text-center py-16 text-[var(--text-secondary)]">
+            <p className="text-xl">No products found in this category.</p>
+          </div>
+        )}
       </main>
       <Footer />
     </div>

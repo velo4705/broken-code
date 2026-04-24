@@ -4,7 +4,6 @@ import { stripe } from '@/lib/stripe';
 export async function POST(req: Request) {
     try {
         // DEFENSIVE CHECK: Ensure the environment variable is loaded
-        // This prevents the "500 Internal Server Error" HTML page crash
         if (!process.env.NEXT_PUBLIC_URL) {
             console.error("CRITICAL ERROR: NEXT_PUBLIC_URL is not defined in .env.local");
             return NextResponse.json(
@@ -15,38 +14,41 @@ export async function POST(req: Request) {
 
         const { cartItems } = await req.json();
 
-        // 1. Safety Check: Don't let Stripe try to process an empty cart
+        // Safety Check: Don't let Stripe try to process an empty cart
         if (!cartItems || cartItems.length === 0) {
             return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
         }
 
-        // 2. Map items to Stripe's format
+        // Map items to Stripe's format
         const line_items = cartItems.map((item: any) => ({
             price_data: {
                 currency: 'usd',
                 product_data: {
                     name: item.name,
                     images: item.image_url ? [item.image_url] : [],
+                    ...(item.description && { description: item.description }),
                 },
-                unit_amount: Math.round(Number(item.price) * 100), // Added Number() for safety
+                unit_amount: Math.round(Number(item.price) * 100),
             },
-            quantity: item.quantity,
+            quantity: item.quantity || 1,
         }));
 
-        // 3. Create the Session
+        // Create the Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items,
             mode: 'payment',
-            success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
+            success_url: `${process.env.NEXT_PUBLIC_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_URL}/cancel`,
+            metadata: {
+                cartItemCount: cartItems.length.toString(),
+            },
         });
 
-        // 4. Return the secure URL to the frontend
-        return NextResponse.json({ url: session.url });
+        // Return the secure URL to the frontend
+        return NextResponse.json({ url: session.url, sessionId: session.id });
 
     } catch (error: any) {
-        // This log will appear in your terminal (Backend)
         console.error('--- STRIPE API ERROR ---');
         console.error(error.message);
 
